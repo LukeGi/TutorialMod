@@ -1,0 +1,4 @@
+#-------- BLOCKS --------
+tile.blue:ore_block.name=Ore Block
+#-------- Items --------
+item.blue:test_item.name=Test Item

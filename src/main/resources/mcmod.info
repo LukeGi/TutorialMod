@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "tutmod",
+    "name": "Tutorial Mod",
+    "description": "",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "BlueMonster"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
