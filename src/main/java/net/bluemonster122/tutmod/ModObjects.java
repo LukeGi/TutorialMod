@@ -35,5 +35,6 @@ public class ModObjects {
   @SideOnly(Side.CLIENT)
   public static void registerObjectModels() {
     blocks.stream().map(Item::getItemFromBlock).forEach(ClientProxy::registerItemModel);
+    items.forEach(ClientProxy::registerItemModel);
   }
 }
