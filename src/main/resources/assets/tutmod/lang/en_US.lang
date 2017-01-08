@@ -1,4 +1,5 @@
 #-------- BLOCKS --------
-tile.blue:ore_block.name=Ore Block
+tile.tutmod:green_ore.name=Green Ore
+tile.tutmod:purple_ore.name=Purple Ore
+tile.tutmod:blue_ore.name=Blue Ore
 #-------- Items --------
-item.blue:test_item.name=Test Item

@@ -4,7 +4,7 @@
     "transform":"forge:default-block",
     "model":"cube_all",
     "textures":{
-      "all": "blue:blocks/ore_block"
+      "all": "tutmod:blocks/blue_ore"
     }
   },
   "variants":{

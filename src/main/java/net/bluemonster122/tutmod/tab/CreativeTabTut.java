@@ -5,9 +5,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-public class BlueCreativeTab extends CreativeTabs {
-  public BlueCreativeTab() {
-    super(Names.BLUE_TAB);
+public class CreativeTabTut extends CreativeTabs {
+  public CreativeTabTut() {
+    super(Names.TUT_TAB);
   }
   
   @Override
