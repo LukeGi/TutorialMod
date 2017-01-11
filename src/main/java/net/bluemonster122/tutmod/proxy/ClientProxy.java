@@ -1,6 +1,8 @@
 package net.bluemonster122.tutmod.proxy;
 
 import net.bluemonster122.tutmod.ModObjects;
+import net.bluemonster122.tutmod.block.base.BlockBase;
+import net.bluemonster122.tutmod.item.ItemBase;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
@@ -15,7 +17,8 @@ public class ClientProxy extends CommonProxy {
   @Override
   public void preInit(FMLPreInitializationEvent event) {
     super.preInit(event);
-    ModObjects.registerObjectModels();
+    ModObjects.getBlocks().forEach(BlockBase::initModelsAndVariants);
+    ModObjects.getItems().forEach(ItemBase::initModelsAndVariants);
   }
   
   @Override

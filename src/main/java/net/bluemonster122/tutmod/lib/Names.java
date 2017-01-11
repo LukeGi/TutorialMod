@@ -11,4 +11,5 @@ public class Names {
   public static final String GREEN_ORE = "green_ore";
   public static final String PURPLE_ORE = "purple_ore";
   public static final String BLUE_ORE = "blue_ore";
+  public static final String ORE_BLOCK = "ore_block";
 }

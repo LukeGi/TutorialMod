@@ -1,8 +1,10 @@
 package net.bluemonster122.tutmod.proxy;
 
 import net.bluemonster122.tutmod.ModObjects;
-import net.bluemonster122.tutmod.worldgen.WorldGenOres;
+import net.bluemonster122.tutmod.block.base.BlockBase;
 import net.bluemonster122.tutmod.tab.CreativeTabTut;
+import net.bluemonster122.tutmod.util.RegistryHelper;
+import net.bluemonster122.tutmod.worldgen.WorldGenOres;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -15,7 +17,11 @@ public abstract class CommonProxy implements IProxy{
   WorldGenOres oreGenerator = new WorldGenOres();
   
   public void preInit(FMLPreInitializationEvent event) {
-    ModObjects.registerObjects();
+    ModObjects.getItems().forEach(GameRegistry::register);
+    for (BlockBase block : ModObjects.getBlocks()) {
+      GameRegistry.register(block);
+      GameRegistry.register(RegistryHelper.getItemBlockFor(block), block.getRegistryName());
+    }
     GameRegistry.registerWorldGenerator(oreGenerator, 0);
   }
   

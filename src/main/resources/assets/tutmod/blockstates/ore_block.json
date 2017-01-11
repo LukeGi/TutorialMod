@@ -1,0 +1,26 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "transform": "forge:default-block",
+    "model": "cube_all"
+  },
+  "variants": {
+    "variant": {
+      "blue_ore": {
+        "textures": {
+          "all": "tutmod:blocks/blue_ore"
+        }
+      },
+      "green_ore": {
+        "textures": {
+          "all": "tutmod:blocks/green_ore"
+        }
+      },
+      "purple_ore": {
+        "textures": {
+          "all": "tutmod:blocks/purple_ore"
+        }
+      }
+    }
+  }
+}
