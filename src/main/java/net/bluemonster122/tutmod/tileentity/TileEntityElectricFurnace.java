@@ -62,7 +62,6 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
         world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, false), 3);
         markDirty();
       }
-      System.out.println(energy.getEnergyStored());
     }
   }
   
