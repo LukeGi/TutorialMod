@@ -2,6 +2,7 @@ package net.bluemonster122.tutmod.tileentity;
 
 import net.bluemonster122.tutmod.block.BlockFurnace;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -12,6 +13,9 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -19,7 +23,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileEntityElectricFurnace extends TileEntity implements ITickable, IItemHandler {
+public class TileEntityElectricFurnace extends TileEntity implements ITickable, IItemHandler, IEnergyStorage {
   public TileEntityElectricFurnace() {
     burntime = -1;
   }
@@ -27,32 +31,38 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   private int burntime;
   private ItemStack input = ItemStack.EMPTY;
   private ItemStack output = ItemStack.EMPTY;
+  private EnergyStorage energy = new EnergyStorage(10000);
   
   @Override
   public void update() {
     if (!world.isRemote) {
-      if (!FurnaceRecipes.instance().getSmeltingResult(input).isEmpty()) {
+      this.energy.receiveEnergy(10, false);
+      if (!FurnaceRecipes.instance().getSmeltingResult(input).isEmpty() && energy.getEnergyStored() > 0) {
         if (burntime == -1) {
           burntime = 100;
         }
         if (burntime == 0) {
           if (smeltItem()) {
             burntime = -1;
+            energy.extractEnergy(100, false);
           }
         }
-        if (burntime > 0)
+        if (burntime > 0) {
           burntime--;
+          energy.extractEnergy(1, false);
+        }
       } else {
         burntime = -1;
       }
       IBlockState state = world.getBlockState(pos);
-      if (burntime > -1 && !state.getValue(BlockFurnace.ACTIVE)){
+      if (burntime > -1 && !state.getValue(BlockFurnace.ACTIVE)) {
         world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, true), 3);
         markDirty();
       } else if (burntime == -1 && state.getValue(BlockFurnace.ACTIVE)) {
         world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, false), 3);
         markDirty();
       }
+      System.out.println(energy.getEnergyStored());
     }
   }
   
@@ -78,19 +88,20 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   
   @Override
   public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-    return capability.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    return capability.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) || capability.equals(CapabilityEnergy.ENERGY);
   }
   
   @Nullable
   @Override
   public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-    return capability.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this) : null;
+    return hasCapability(capability, facing) ? capability.cast((T) this) : null;
   }
   
   @Override
   public NBTTagCompound writeToNBT(NBTTagCompound compound) {
     compound.setTag("inputInventory", input.serializeNBT());
     compound.setTag("outputInventory", output.serializeNBT());
+    compound.setInteger("energy", energy.getEnergyStored());
     return super.writeToNBT(compound);
   }
   
@@ -98,6 +109,7 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   public void readFromNBT(NBTTagCompound compound) {
     input = new ItemStack(compound.getCompoundTag("inputInventory"));
     output = new ItemStack(compound.getCompoundTag("outputInventory"));
+    energy.receiveEnergy(compound.getInteger("energy"), false);
     super.readFromNBT(compound);
   }
   
@@ -209,5 +221,41 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   
   private static boolean canCombine(ItemStack thisStack, ItemStack thatStack) {
     return thisStack.getItem() == thatStack.getItem() && (thisStack.getMetadata() == thatStack.getMetadata() && (thisStack.getCount() <= thisStack.getMaxStackSize() && ItemStack.areItemStackTagsEqual(thisStack, thatStack)));
+  }
+  
+  @Override
+  public int receiveEnergy(int maxReceive, boolean simulate) {
+    return energy.receiveEnergy(maxReceive, simulate);
+  }
+  
+  @Override
+  public int extractEnergy(int maxExtract, boolean simulate) {
+    return energy.extractEnergy(maxExtract, simulate);
+  }
+  
+  @Override
+  public int getEnergyStored() {
+    return energy.getEnergyStored();
+  }
+  
+  @Override
+  public int getMaxEnergyStored() {
+    return energy.getMaxEnergyStored();
+  }
+  
+  @Override
+  public boolean canExtract() {
+    return false;
+  }
+  
+  @Override
+  public boolean canReceive() {
+    return true;
+  }
+  
+  public void dropInv() {
+    if (world.isRemote) return;
+    world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), input));
+    world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), output));
   }
 }

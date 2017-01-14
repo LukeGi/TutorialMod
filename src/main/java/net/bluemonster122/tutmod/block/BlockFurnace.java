@@ -66,6 +66,12 @@ public class BlockFurnace extends BlockBase implements IHasTile {
   }
   
   @Override
+  public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    ((TileEntityElectricFurnace)worldIn.getTileEntity(pos)).dropInv();
+    super.breakBlock(worldIn, pos, state);
+  }
+  
+  @Override
   @SideOnly(Side.CLIENT)
   public void initModelsAndVariants() {
     ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this),0,new ModelResourceLocation(getRegistryName(), "active=false,facing=north"));
