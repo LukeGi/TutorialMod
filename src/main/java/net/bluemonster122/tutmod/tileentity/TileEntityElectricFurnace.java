@@ -10,6 +10,7 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,27 +26,36 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   
   @Override
   public void update() {
-    if (FurnaceRecipes.instance().getSmeltingResult(input) != ItemStack.EMPTY) {
-      if (burntime == -1)
-        burntime = 100;
-      if (burntime > 0)
-        burntime--;
-      if (burntime == 0)
-        if (smeltItem()) {
-          burntime--;
+    if (!world.isRemote) {
+      if (!FurnaceRecipes.instance().getSmeltingResult(input).isEmpty()) {
+        if (burntime == -1)
+          burntime = 100;
+        if (burntime == 0) {
+          if (smeltItem()) {
+            burntime = -1;
+          }
         }
-    } else {
-      burntime = -1;
+        if (burntime > 0)
+          burntime--;
+      } else {
+        burntime = -1;
+      }
+      if (world.getTotalWorldTime() % 20 == 0)
+        System.out.println(burntime);
     }
   }
   
   private boolean smeltItem() {
     ItemStack result = FurnaceRecipes.instance().getSmeltingResult(input);
-    if (insertItem(1, result, true) == ItemStack.EMPTY) {
-      insertItem(1, result, false);
+    if (output.isEmpty()) {
+      output = result.copy();
       world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result) % 1)));
       input.shrink(1);
       return true;
+    } else if (canCombine(output, result)) {
+      output.grow(1);
+      world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result) % 1)));
+      input.shrink(1);
     }
     return false;
   }
@@ -95,38 +105,85 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   @Nonnull
   @Override
   public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-    if (slot == 0) {
-      if (input.isEmpty()) {
-        input = stack;
-        return ItemStack.EMPTY;
-      } else if (canCombine(input, stack)) {
-        int i = stack.getMaxStackSize() - input.getCount();
-        int j = Math.min(stack.getCount(), i);
-        stack.shrink(j);
-        if (!simulate)
-          input.grow(j);
+    if (stack.isEmpty())
+      return ItemStack.EMPTY;
+    if (slot != 0) return stack;
+    
+    int m;
+    if (!input.isEmpty()) {
+      if (!ItemHandlerHelper.canItemStacksStack(stack, input))
         return stack;
+      
+      m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot)) - input.getCount();
+      
+      if (stack.getCount() <= m) {
+        if (!simulate) {
+          ItemStack copy = stack.copy();
+          copy.grow(input.getCount());
+          input = copy;
+          markDirty();
+        }
+        
+        return ItemStack.EMPTY;
+      } else {
+        // copy the stack to not modify the original one
+        stack = stack.copy();
+        if (!simulate) {
+          ItemStack copy = stack.splitStack(m);
+          copy.grow(input.getCount());
+          input = copy;
+          markDirty();
+          return stack;
+        } else {
+          stack.shrink(m);
+          return stack;
+        }
+      }
+    } else {
+      m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot));
+      if (m < stack.getCount()) {
+        // copy the stack to not modify the original one
+        stack = stack.copy();
+        if (!simulate) {
+          input = stack.splitStack(m);
+          markDirty();
+          return stack;
+        } else {
+          stack.shrink(m);
+          return stack;
+        }
+      } else {
+        if (!simulate) {
+          input = stack;
+          markDirty();
+        }
+        return ItemStack.EMPTY;
       }
     }
-    return stack;
   }
   
   @Nonnull
   @Override
   public ItemStack extractItem(int slot, int amount, boolean simulate) {
-    if (amount == 0 || output.isEmpty()) return ItemStack.EMPTY;
+    if (amount == 0 || output.isEmpty() || slot != 1)
+      return ItemStack.EMPTY;
     
-    if (amount >= output.getCount()) {
-      return output;
+    if (simulate) {
+      if (output.getCount() < amount) {
+        return output.copy();
+      } else {
+        ItemStack copy = output.copy();
+        copy.setCount(amount);
+        return copy;
+      }
+    } else {
+      int m = Math.min(output.getCount(), amount);
+      
+      ItemStack decrStackSize = output.copy();
+      output.shrink(m);
+      markDirty();
+      return decrStackSize;
     }
-    if (amount < output.getCount()) {
-      if (!simulate)
-        output.shrink(amount);
-      ItemStack ret = output.copy();
-      ret.setCount(amount);
-      return ret;
-    }
-    return ItemStack.EMPTY;
   }
   
   @Override
