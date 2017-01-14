@@ -1,5 +1,7 @@
 package net.bluemonster122.tutmod.tileentity;
 
+import net.bluemonster122.tutmod.block.BlockFurnace;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -7,6 +9,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -28,8 +32,9 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   public void update() {
     if (!world.isRemote) {
       if (!FurnaceRecipes.instance().getSmeltingResult(input).isEmpty()) {
-        if (burntime == -1)
+        if (burntime == -1) {
           burntime = 100;
+        }
         if (burntime == 0) {
           if (smeltItem()) {
             burntime = -1;
@@ -40,8 +45,14 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
       } else {
         burntime = -1;
       }
-      if (world.getTotalWorldTime() % 20 == 0)
-        System.out.println(burntime);
+      IBlockState state = world.getBlockState(pos);
+      if (burntime > -1 && !state.getValue(BlockFurnace.ACTIVE)){
+        world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, true), 3);
+        markDirty();
+      } else if (burntime == -1 && state.getValue(BlockFurnace.ACTIVE)) {
+        world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, false), 3);
+        markDirty();
+      }
     }
   }
   
@@ -58,6 +69,11 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
       input.shrink(1);
     }
     return false;
+  }
+  
+  @Override
+  public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+    return oldState.getBlock() != newSate.getBlock();
   }
   
   @Override
