@@ -3,6 +3,7 @@ package net.bluemonster122.tutmod;
 import net.bluemonster122.tutmod.block.BlockElectricFurnace;
 import net.bluemonster122.tutmod.block.BlockOre;
 import net.bluemonster122.tutmod.block.base.BlockBase;
+import net.bluemonster122.tutmod.block.base.BlockGenerator;
 import net.bluemonster122.tutmod.item.ItemBase;
 import net.bluemonster122.tutmod.lib.ModInfo;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -21,6 +22,7 @@ public class ModObjects {
   
   public static final BlockBase block_ore = new BlockOre();
   public static final BlockBase furnace_block = new BlockElectricFurnace();
+  public static final BlockBase generator = new BlockGenerator();
   
   public static final ItemBase item = new ItemBase("test_item");
   

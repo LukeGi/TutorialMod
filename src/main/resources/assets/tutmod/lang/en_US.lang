@@ -4,3 +4,4 @@ tile.tutmod:purple_ore.name=Purple Ore
 tile.tutmod:blue_ore.name=Blue Ore
 tile.tutmod:furnace_block.name=Electric Furnace
 #-------- Items --------
+item.tutmod:test_item.name=Test Item
