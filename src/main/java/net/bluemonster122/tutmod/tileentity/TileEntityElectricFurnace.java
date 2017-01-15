@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.items.ItemStackHandler;
@@ -29,13 +30,13 @@ public class TileEntityElectricFurnace extends TileEntityMachineBase implements 
         burn_time = 100;
       }
       if (burn_time == 0) {
-        if (smeltItem()) {
+        if (getEnergy().extractEnergy(1500, true) == 1500 && smeltItem()) {
           burn_time = -1;
           getEnergy().extractEnergy(1500, false);
           markDirty();
         }
       }
-      if (burn_time > 0) {
+      if (getEnergy().extractEnergy(100, true) == 100 && burn_time > 0) {
         burn_time--;
         getEnergy().extractEnergy(100, false);
       }
@@ -64,14 +65,15 @@ public class TileEntityElectricFurnace extends TileEntityMachineBase implements 
   
   private boolean smeltItem() {
     ItemStack result = FurnaceRecipes.instance().getSmeltingResult(inventory.getStackInSlot(0));
+    BlockPos blockPos = this.pos.offset(world.getBlockState(pos).getValue(BlockElectricFurnace.FACING));
     if (inventory.getStackInSlot(1).isEmpty()) {
       inventory.setStackInSlot(1, result.copy());
-      world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result))));
+      world.spawnEntity(new EntityXPOrb(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result))));
       inventory.getStackInSlot(0).shrink(1);
       return true;
     } else if (canCombine(inventory.getStackInSlot(1), result)) {
       inventory.getStackInSlot(1).grow(1);
-      world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result))));
+      world.spawnEntity(new EntityXPOrb(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result))));
       inventory.getStackInSlot(0).shrink(1);
       return true;
     }

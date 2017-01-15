@@ -41,7 +41,7 @@ public class GuiElectricFurnace extends GuiContainer {
     drawTexturedModalRect(left + 173, top + 85 - energyPercent, 194, 85 - energyPercent, 16, energyPercent);
     if (tile.getBurntime() != -1) {
       int burnPerc = (int) ((float) (100 - tile.getBurntime()) / 100F * 109);
-      drawTexturedModalRect(left + 30, top + 11, 30, 116, burnPerc, 15);
+      drawTexturedModalRect(left + 29, top + 10, 29, 115, burnPerc, 15);
     }
   }
   

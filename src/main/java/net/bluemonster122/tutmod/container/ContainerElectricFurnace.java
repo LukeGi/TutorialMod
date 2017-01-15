@@ -55,7 +55,7 @@ public class ContainerElectricFurnace extends Container {
       ItemStack current = slot.getStack();
       previous = current.copy();
       
-      if (fromSlot < 72) {
+      if (fromSlot < 2) {
         // From TE Inventory to Player Inventory
         if (!this.mergeItemStack(current, 2, 38, true))
           return ItemStack.EMPTY;

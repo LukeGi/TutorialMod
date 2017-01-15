@@ -12,7 +12,7 @@ public class TileEntityGenerator extends TileEntityMachineBase {
   
   @Override
   protected void tickServer() {
-    getEnergy().receiveEnergy(1, false);
+    getEnergy().receiveEnergy(15, false);
     List<TileEntity> list = new ArrayList<>();
     for (int x = -25; x < 25; x++) {
       for (int y = -25; y < 25; y++) {
@@ -34,11 +34,9 @@ public class TileEntityGenerator extends TileEntityMachineBase {
   
   private void giveEnergy(IEnergyStorage t, int i) {
     if (getEnergy().getEnergyStored() != 0 && t.canReceive() && t.getEnergyStored() != t.getMaxEnergyStored()) {
-      System.out.println("after: " + getEnergy().getEnergyStored());
       int energy = getEnergy().extractEnergy(i, false);
       int notRecieved = energy - t.receiveEnergy(energy, false);
       getEnergy().receiveEnergy(notRecieved, false);
-      System.out.println("before: " + getEnergy().getEnergyStored());
     }
   }
   
