@@ -1,6 +1,6 @@
 package net.bluemonster122.tutmod;
 
-import net.bluemonster122.tutmod.block.BlockFurnace;
+import net.bluemonster122.tutmod.block.BlockElectricFurnace;
 import net.bluemonster122.tutmod.block.BlockOre;
 import net.bluemonster122.tutmod.block.base.BlockBase;
 import net.bluemonster122.tutmod.item.ItemBase;
@@ -20,7 +20,7 @@ public class ModObjects {
   private static final List<ItemBase> items = new ArrayList<>();
   
   public static final BlockBase block_ore = new BlockOre();
-  public static final BlockBase furnace_block = new BlockFurnace();
+  public static final BlockBase furnace_block = new BlockElectricFurnace();
   
   public static final ItemBase item = new ItemBase("test_item");
   

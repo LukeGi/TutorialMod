@@ -3,7 +3,6 @@ package net.bluemonster122.tutmod.worldgen;
 import net.bluemonster122.tutmod.ModObjects;
 import net.bluemonster122.tutmod.block.BlockOre;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkGenerator;
@@ -14,6 +13,32 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 import java.util.Random;
 
 public class WorldGenOres implements IWorldGenerator {
+  @Override
+  public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+    switch (world.provider.getDimension()) {
+      case 0: // The Overworld
+        generateOverworld(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
+      case 1: // The End
+        // NOOP
+      case -1: // The Nether
+        //NOOP
+    }
+  }
+  
+  private void generateOverworld(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+    generateOre(ModObjects.block_ore.getDefaultState().withProperty(BlockOre.VARIENTS, BlockOre.OreTypes.BLUE), world, random, chunkX << 4, chunkZ << 4, 0, 256, 10 + random.nextInt(15), 8);
+  }
+  
+  private void generateOre(IBlockState ore, World world, Random random, int x, int z, int minY, int maxY, int size, int chances){
+    for (int i = 0; i < chances; i++) {
+      BlockPos pos = new BlockPos(x + random.nextInt(16), minY + random.nextInt(maxY - minY), z + random.nextInt(16));
+      WorldGenMinable generator = new WorldGenMinable(ore, size);
+      generator.generate(world, random, pos);
+    }
+  }
+  
+  /*
+  
   @Override
   public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
     // This checks which dimension is being generated, and then generating the relevant things.
@@ -56,4 +81,6 @@ public class WorldGenOres implements IWorldGenerator {
     int posZ = blockZPos + random.nextInt(maxZ);
     (new WorldGenMinable(block, maxVeinSize, b -> b.equals(Blocks.STONE.getDefaultState()))).generate(world, random, new BlockPos(posX, posY, posZ));
   }
+  
+  */
 }

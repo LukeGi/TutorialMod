@@ -1,12 +1,14 @@
 package net.bluemonster122.tutmod.tileentity;
 
-import net.bluemonster122.tutmod.block.BlockFurnace;
+import net.bluemonster122.tutmod.block.BlockElectricFurnace;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -16,19 +18,21 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileEntityElectricFurnace extends TileEntity implements ITickable, IItemHandler, IEnergyStorage {
+public class TileEntityElectricFurnace extends TileEntity implements ITickable, IItemHandlerModifiable, IEnergyStorage {
   public TileEntityElectricFurnace() {
-    burntime = -1;
+    burn_time = -1;
   }
   
-  private int burntime;
+  private int burn_time;
   private ItemStack input = ItemStack.EMPTY;
   private ItemStack output = ItemStack.EMPTY;
   private EnergyStorage energy = new EnergyStorage(10000);
@@ -36,32 +40,33 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   @Override
   public void update() {
     if (!world.isRemote) {
-      this.energy.receiveEnergy(10, false);
       if (!FurnaceRecipes.instance().getSmeltingResult(input).isEmpty() && energy.getEnergyStored() > 0) {
-        if (burntime == -1) {
-          burntime = 100;
+        if (burn_time == -1) {
+          burn_time = 100;
         }
-        if (burntime == 0) {
+        if (burn_time == 0) {
           if (smeltItem()) {
-            burntime = -1;
-            energy.extractEnergy(100, false);
+            burn_time = -1;
+            energy.extractEnergy(150, false);
+            markDirty();
           }
         }
-        if (burntime > 0) {
-          burntime--;
-          energy.extractEnergy(1, false);
+        if (burn_time > 0) {
+          burn_time--;
+          energy.extractEnergy(10, false);
         }
       } else {
-        burntime = -1;
+        burn_time = -1;
       }
       IBlockState state = world.getBlockState(pos);
-      if (burntime > -1 && !state.getValue(BlockFurnace.ACTIVE)) {
-        world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, true), 3);
+      if (burn_time > -1 && !state.getValue(BlockElectricFurnace.ACTIVE)) {
+        world.setBlockState(pos, state.withProperty(BlockElectricFurnace.ACTIVE, true), 3);
         markDirty();
-      } else if (burntime == -1 && state.getValue(BlockFurnace.ACTIVE)) {
-        world.setBlockState(pos, state.withProperty(BlockFurnace.ACTIVE, false), 3);
+      } else if (burn_time == -1 && state.getValue(BlockElectricFurnace.ACTIVE)) {
+        world.setBlockState(pos, state.withProperty(BlockElectricFurnace.ACTIVE, false), 3);
         markDirty();
       }
+      world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
     }
   }
   
@@ -76,6 +81,7 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
       output.grow(1);
       world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), (int) (FurnaceRecipes.instance().getSmeltingExperience(result) % 1)));
       input.shrink(1);
+      return true;
     }
     return false;
   }
@@ -83,6 +89,24 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   @Override
   public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
     return oldState.getBlock() != newSate.getBlock();
+  }
+  
+  
+  @Override
+  public SPacketUpdateTileEntity getUpdatePacket() {
+    return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
+  }
+  
+  @Override
+  @SideOnly(Side.CLIENT)
+  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+    this.readFromNBT(pkt.getNbtCompound());
+  }
+  
+  @Nonnull
+  @Override
+  public NBTTagCompound getUpdateTag() {
+    return writeToNBT(super.getUpdateTag());
   }
   
   @Override
@@ -93,7 +117,13 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   @Nullable
   @Override
   public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-    return hasCapability(capability, facing) ? capability.cast((T) this) : null;
+    if (capability.equals(CapabilityEnergy.ENERGY)){
+      return CapabilityEnergy.ENERGY.cast(this);
+    }
+    if (capability.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+      return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this);
+    }
+    return null;
   }
   
   @Override
@@ -101,6 +131,7 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
     compound.setTag("inputInventory", input.serializeNBT());
     compound.setTag("outputInventory", output.serializeNBT());
     compound.setInteger("energy", energy.getEnergyStored());
+    compound.setInteger("burntime", burn_time);
     return super.writeToNBT(compound);
   }
   
@@ -108,7 +139,9 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
   public void readFromNBT(NBTTagCompound compound) {
     input = new ItemStack(compound.getCompoundTag("inputInventory"));
     output = new ItemStack(compound.getCompoundTag("outputInventory"));
+    energy = new EnergyStorage(10000);
     energy.receiveEnergy(compound.getInteger("energy"), false);
+    burn_time = compound.getInteger("burntime");
     super.readFromNBT(compound);
   }
   
@@ -256,5 +289,14 @@ public class TileEntityElectricFurnace extends TileEntity implements ITickable, 
     if (world.isRemote) return;
     world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), input));
     world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), output));
+  }
+  
+  @Override
+  public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+    if (slot == 0) input = stack;
+  }
+  
+  public int getBurntime() {
+    return burn_time;
   }
 }
