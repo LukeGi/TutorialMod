@@ -5,7 +5,7 @@
     "model": "orientable",
     "textures": {
       "top": "tutmod:blocks/machines/furnace_top",
-      "front": "tutmod:blocks/machines/furnace_front",
+      "front": "tutmod:blocks/machines/generator_front",
       "side": "tutmod:blocks/machines/furnace_side"
     }
   },
@@ -13,7 +13,7 @@
     "active": {
       "true": {
         "textures": {
-          "front": "tutmod:blocks/machines/furnace_front_on"
+          "front": "tutmod:blocks/machines/generator_front_on"
         }
       },
       "false": {}
