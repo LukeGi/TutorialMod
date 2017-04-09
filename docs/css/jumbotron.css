@@ -1,0 +1,20 @@
+#jumbotron {
+	margin-top: 50px;
+	margin-bottom: 0px;
+	z-index: 1000;
+}
+
+#jumbotron table td {
+	background-color: #6B4700;
+	box-shadow: 1px;
+}
+
+#jumbotron img {
+	border-radius: 64px;
+}
+
+#jumbotron h1 {
+	color: #D4961C;
+	font-family: "Verdana", sans-serif;
+	font-size: 24px;
+}

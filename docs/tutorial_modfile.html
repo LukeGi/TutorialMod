@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<title>BlueDocs - Making Your @Mod File</title>
+<link rel="StyleSheet" type="text/css" href="css/default.css">
+<link rel="StyleSheet" type="text/css" href="css/navbar.css">
+<link rel="StyleSheet" type="text/css" href="css/jumbotron.css">
+<link rel="StyleSheet" type="text/css" href="css/tutorial.css">
+<link rel="StyleSheet" type="text/css" href="css/footer.css">
+</head>
+<body>
+<div id="navbar">
+<ul>
+<li><a href="home.html">Home</a></li>
+<li><a href="tutorials.html">Tutorials</a></li>
+<li id="right"><a href="#">About</a></li>
+<li id="right"><a href="#">Contact</a></li>
+</ul>
+</div>
+<div id="jumbotron">
+<table width="100%" cellspacing=0 cellpadding=15>
+<tr>
+<td width=128>
+<img src="img/blueicon.png" alt="BlueIcon" title="BlueIcon" width=128 height=128>
+</td>
+<td width="*" align="center">
+<h1>This Website is all about showing you how to make a Minecraft Mod with the Minecraft Forge MDK.</h1>
+</td>
+</tr>
+</table>
+</div>
+<div id="tutorial">
+<div id="title"><h1>Making Your @Mod File</h1></div>
+<div id="box">
+<p></p><h2>@Mod</h2><p>FML (Forge Mod Loader), now a component of Minecraft Forge, uses the <strong>@Mod</strong> annotation to locate the mods when loading the game. It takes the following arguments: <br>
+<code>String modid() **<br>
+String name() default "" *<br>
+String version() default "" *<br>
+String dependencies() default ""<br>
+boolean useMetadata() default false<br>
+boolean clientSideOnly() default false<br>
+boolean serverSideOnly() default false<br>
+String acceptedMinecraftVersions() default ""<br>
+String acceptableRemoteVersions() default ""<br>
+String acceptableSaveVersions() default ""<br>
+Stirng certificateFingerprint() default ""<br>
+String modLanguage() defualt "java"<br>
+String modLanguageAdapter() default ""<br>
+boolean canBeDeactivated() default false<br>
+String guiFactory() default ""<br>
+String updateJSON() default ""<br>
+CustomProperty[] customProperties() default {}<br>
+</code> ** use is required <br>
+* use is recommended<br>
+<br>
+When I make my mods I generally use the following as a bare minimum, where <strong>ModInfo.class</strong> is a reference class: <br>
+<code>@Mod(modid=ModInfo.MOD_ID, name=ModInfo.MOD_NAME, version=ModInfo.VERSION)<br>
+public class MyMod <br>
+{ <br>
+	// modfilestuff <br>
+}</code><br>
+Right... now we have the <strong>@Mod</strong> annotation out of the way, we can move on to the contents of the Mod file. This is a very subjective matter; some people need some things where others don't. So here are all the things that you might need... in order of likelyness of requirement.</p><br>
+<h2>@Mod.EventHandler-s</h2><br>
+<h3>FMLPreInitializationEvent</h3> <p>There are a few things that you can do in this event. the recommended ones are as follows:<br>
+*This is a slightly modified version of the documentation copied directly from the documentation on the FMLPreInitializationEvent class*<br>
+&gt; Setup your logging <strong>e.getModLog()</strong><br>
+&gt; Load any configuration data you might have <strong>e.getSuggestedConfigurationFile()</strong><br>
+&gt; Search for a version.properties file and load it <strong>e.getVersionProperties()</strong><br>
+&gt; Configure your ModMetadata programmatically <strong>e.getModMetadata()</strong><br>
+&gt; Register your blocks and items with the <strong>net.minecraftforge.fml.common.registry.GameRegistry</strong><br>
+&gt; Discover parts of your mod by using annotation search <strong>e.getAsmData()</strong><br>
+</p>
+</div>
+</div>
+<div id="footer">
+<a href="https://twitter.com/Blue_Monster122" target="_blank"><img src="img/Twitter.png"></a>
+<a href="https://github.com/bluemonster122" target="_blank"><img src="img/Github.png"></a>
+<a href="mailto:boo122333@gmail.com"><img src="img/Email.png"></a>
+</div>
+</body>
+</html>
