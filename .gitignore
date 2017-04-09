@@ -16,3 +16,4 @@
 !/gradle.properties
 !/webresources
 .DS_Store
+!/docs/
