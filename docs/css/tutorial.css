@@ -32,15 +32,13 @@
 	text-decoration: none;
 	color: #E3AF48;
 	transition-timing-function: ease-out;
-	transition: font-size .75s, color .5s, background-color .5s;
+	transition: font-size .75s;
 	webkit-transition-timing-function: ease-out;
-	webkit-transition: font-size .75s, color .5s, background-color .5s;
+	webkit-transition: font-size .75s;
 }
 
 #tutorial a:hover {
 	font-size: 25px;
-	color: #0E4671;
-	background-color: #E3AF48;
 }
 #tutorial h2 {
 	max-width: 90%;
