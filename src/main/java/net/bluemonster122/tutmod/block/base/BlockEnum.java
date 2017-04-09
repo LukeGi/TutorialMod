@@ -1,10 +1,12 @@
 package net.bluemonster122.tutmod.block.base;
 
+import net.bluemonster122.tutmod.item.ItemBlockEnum;
 import net.bluemonster122.tutmod.lib.ModInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,4 +40,9 @@ public abstract class BlockEnum extends BlockBase {
   }
   
   public abstract IEnumMeta[] getVariants();
+  
+  @Override
+  public ItemBlock getItemBlock() {
+    return new ItemBlockEnum(this);
+  }
 }
