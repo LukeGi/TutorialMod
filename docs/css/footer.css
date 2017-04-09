@@ -1,5 +1,6 @@
 #footer {
     color: 6B0000;
+	height: 65px;
     text-align: center;
 }
 
@@ -7,4 +8,31 @@
 	width: 64px;
 	height: 64px;
 	padding: 25px;
+}
+
+@keyframes myfirst {
+    0%   {background-color:#6B0000;   width: 64px; height: 64px;}
+    50%   {background-color:#6B0000; width: 65px; height: 65px;}
+    100% {background-color:#6B0000; width: 64px; height: 64px;}
+}
+
+#bird {
+	animation-name: myfirst;
+    animation-duration: .25s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+#cat {
+	animation-name: myfirst;
+    animation-duration: .5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+#evlp {
+	animation-name: myfirst;
+    animation-duration: .25s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }

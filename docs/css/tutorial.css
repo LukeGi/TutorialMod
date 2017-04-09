@@ -4,6 +4,10 @@
 	color: white;
 }
 
+#tutorial p > a > strong {
+	padding : 12px;
+}
+
 #tutorial strong {
 	border-radius: 2px; 
 	padding: 1px;
@@ -27,9 +31,12 @@
 	padding: 5px;
 	text-decoration: none;
 	color: #E3AF48;
+	transition-timing-function: ease-out;
+	transition: font-size .75s, color .5s, background-color .5s;
 }
 
 #tutorial a:hover {
+	font-size: 25px;
 	color: #0E4671;
 	background-color: #E3AF48;
 }
