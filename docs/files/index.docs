@@ -1,0 +1,3 @@
+Home
+This website was created to help newbies, and experienced modders all use the same methods.
+For example, i want it to be made clear that RegistryEvent.Register and RegistryEvent.Register are a thing. Furthermore letting people know that @Mod.EventBusSubscriber can be used to hook events into the MinecraftForge.EVENT_BUS.
