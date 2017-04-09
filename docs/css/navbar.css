@@ -36,14 +36,13 @@
 	text-decoration: none;
 	text-transform: uppercase;
 	transition-timing-function: ease-out;
-	transition: font-size .75s, color .5s, background-color .5s;
+	transition: color .5s;
 	webkit-transition-timing-function: ease-out;
-	webkit-transition: font-size .75s;
+	webkit-transition: color .75s;
 }
 
 #navbar a:hover {
-    margin: 0px;
-    font-size: 28px;
+    color: #AF780B;
 }
 
 #navbar li#right {
